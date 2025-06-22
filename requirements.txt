@@ -1,0 +1,11 @@
+Flask
+pymongo
+passlib
+opencv-python
+numpy
+torch
+ultralytics
+Pillow
+matplotlib
+pandas
+torchvision
