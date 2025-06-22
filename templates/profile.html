@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+  <div class="row">
+    <div class="col-md-6">
+      <h2>Your Profile</h2>
+      <form method="POST" action="{{ url_for('user.profile') }}">
+        <div class="mb-3">
+          <label for="weight" class="form-label">Weight (kg)</label>
+          <input type="number" class="form-control" id="weight" name="weight" value="{{ user.weight }}" step="0.1" required>
+        </div>
+        
+        <div class="mb-3">
+          <label for="height" class="form-label">Height (cm)</label>
+          <input type="number" class="form-control" id="height" name="height" value="{{ user.height }}" required>
+        </div>
+        
+        <div class="mb-3">
+          <label for="age" class="form-label">Age</label>
+          <input type="number" class="form-control" id="age" name="age" value="{{ user.age }}" required>
+        </div>
+        
+        <div class="mb-3">
+          <label for="gender" class="form-label">Gender</label>
+          <select class="form-select" id="gender" name="gender" required>
+            <option value="male" {% if user.gender == 'male' %}selected{% endif %}>Male</option>
+            <option value="female" {% if user.gender == 'female' %}selected{% endif %}>Female</option>
+          </select>
+        </div>
+        
+        <div class="mb-3">
+          <label for="activity_level" class="form-label">Activity Level</label>
+          <select class="form-select" id="activity_level" name="activity_level" required>
+            <option value="sedentary" {% if user.activity_level == 'sedentary' %}selected{% endif %}>Sedentary (little or no exercise)</option>
+            <option value="light" {% if user.activity_level == 'light' %}selected{% endif %}>Lightly active (1-3 days/week)</option>
+            <option value="moderate" {% if user.activity_level == 'moderate' %}selected{% endif %}>Moderately active (3-5 days/week)</option>
+            <option value="very" {% if user.activity_level == 'very' %}selected{% endif %}>Very active (6-7 days/week)</option>
+            <option value="extra" {% if user.activity_level == 'extra' %}selected{% endif %}>Extra active (very active + physical job)</option>
+          </select>
+        </div>
+        
+        <div class="mb-3">
+          <label for="goal" class="form-label">Goal</label>
+          <select class="form-select" id="goal" name="goal" required>
+            <option value="loss" {% if user.goal == 'loss' %}selected{% endif %}>Weight Loss</option>
+            <option value="maintenance" {% if user.goal == 'maintenance' %}selected{% endif %}>Maintenance</option>
+            <option value="gain" {% if user.goal == 'gain' %}selected{% endif %}>Weight Gain</option>
+          </select>
+        </div>
+        
+        <button type="submit" class="btn btn-primary">Update Profile</button>
+      </form>
+    </div>
+    
+    <div class="col-md-6">
+      <h2>Your Calculations</h2>
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">BMR (Basal Metabolic Rate)</h5>
+          <p class="card-text">{{ user.bmr|round|int }} calories/day</p>
+          
+          <h5 class="card-title">TDEE (Total Daily Energy Expenditure)</h5>
+          <p class="card-text">{{ user.tdee|round|int }} calories/day</p>
+          
+          <h5 class="card-title">Daily Caloric Target</h5>
+          <p class="card-text">{{ user.daily_calories|round|int }} calories/day</p>
+          
+          <h5 class="card-title">Macronutrient Distribution</h5>
+          <ul class="list-unstyled">
+            <li>Protein: {{ user.protein_grams|round|int }}g ({{ (user.protein_percentage * 100)|round|int }}%)</li>
+            <li>Fat: {{ user.fat_grams|round|int }}g ({{ (user.fat_percentage * 100)|round|int }}%)</li>
+            <li>Carbs: {{ user.carbs_grams|round|int }}g ({{ (user.carbs_percentage * 100)|round|int }}%)</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} 

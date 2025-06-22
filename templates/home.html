@@ -1,0 +1,957 @@
+{% extends 'base.html' %}
+{% block content %}
+<div style="max-width: 1000px; margin: 0 auto; padding: 20px;">
+    <div style="text-align: right; margin-bottom: 20px;">
+        <button id="logout-btn" class="btn btn-secondary" style="padding: 8px 15px;">🔓L</button>
+    </div>
+    <h2 style="text-align: center; margin-bottom: 30px;">SmartNutrition</h2>
+    <h2 style="text-align: center; margin-bottom: 30px;">Hello, {{ user.name }}!</h2>
+
+    <!-- Nutrition Progress Rings -->
+    <div id="nutrition-dashboard" style="display: none;">
+        <div style="display: flex; flex-wrap: wrap; justify-content: space-around; margin-bottom: 40px;">
+            <div class="progress-ring-container">
+                <svg class="progress-ring" width="120" height="120" data-metric="calories">
+                    <circle class="progress-ring-circle" stroke="#4CAF50" stroke-width="8" fill="transparent" r="52" cx="60" cy="60"/>
+                    <text x="60" y="60" text-anchor="middle" dy=".3em" font-size="16" font-weight="bold"></text>
+                    <text x="60" y="85" text-anchor="middle" dy=".3em" font-size="12">Calories</text>
+                </svg>
+            </div>
+            <div class="progress-ring-container">
+                <svg class="progress-ring" width="120" height="120" data-metric="protein">
+                    <circle class="progress-ring-circle" stroke="#2196F3" stroke-width="8" fill="transparent" r="52" cx="60" cy="60"/>
+                    <text x="60" y="60" text-anchor="middle" dy=".3em" font-size="16" font-weight="bold"></text>
+                    <text x="60" y="85" text-anchor="middle" dy=".3em" font-size="12">Protein (g)</text>
+                </svg>
+            </div>
+            <div class="progress-ring-container">
+                <svg class="progress-ring" width="120" height="120" data-metric="carbs">
+                    <circle class="progress-ring-circle" stroke="#FFC107" stroke-width="8" fill="transparent" r="52" cx="60" cy="60"/>
+                    <text x="60" y="60" text-anchor="middle" dy=".3em" font-size="16" font-weight="bold"></text>
+                    <text x="60" y="85" text-anchor="middle" dy=".3em" font-size="12">Carbs (g)</text>
+                </svg>
+            </div>
+            <div class="progress-ring-container">
+                <svg class="progress-ring" width="120" height="120" data-metric="fats">
+                    <circle class="progress-ring-circle" stroke="#F44336" stroke-width="8" fill="transparent" r="52" cx="60" cy="60"/>
+                    <text x="60" y="60" text-anchor="middle" dy=".3em" font-size="16" font-weight="bold"></text>
+                    <text x="60" y="85" text-anchor="middle" dy=".3em" font-size="12">Fats (g)</text>
+                </svg>
+            </div>
+        </div>
+        
+        <div style="text-align: center; margin-bottom: 30px;">
+            <button id="add-food-btn" class="btn btn-primary" style="padding: 10px 20px; font-size: 16px; margin-right: 10px;">
+                Add Food
+            </button>
+            <br>
+            <br>
+            <button id="edit-profile-btn" class="btn btn-secondary" style="padding: 10px 20px; font-size: 16px; background-color: #161718;">
+                Edit Profile
+            </button>
+        </div>
+    </div>
+    
+    <!-- Profile Form -->
+    <div id="profile-form-container" style="max-width: 600px; margin: 0 auto;">
+        <div class="card" style="border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+            <div class="card-body">
+                <h5 class="card-title" style="text-align: center; margin-bottom: 20px;">Calculate Your Nutrition Goals</h5>
+                <form id="profile-form">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="age" class="form-label">Age</label>
+                            <input type="number" class="form-control" id="age" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="sex" class="form-label">Sex</label>
+                            <select class="form-select" id="sex" required>
+                                <option value="">Select</option>
+                                <option value="male">Male</option>
+                                <option value="female">Female</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="weight" class="form-label">Weight (kg)</label>
+                            <input type="number" step="0.1" class="form-control" id="weight" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="height" class="form-label">Height (cm)</label>
+                            <input type="number" step="0.1" class="form-control" id="height" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="occupation-type" class="form-label">Occupation Type</label>
+                        <select class="form-select" id="occupation-type">
+                            <option value="">Select</option>
+                            <option value="sedentary">Mostly Sitting (Office Job)</option>
+                            <option value="light">Some Walking (Retail, Teaching)</option>
+                            <option value="moderate">Active (Healthcare, Construction)</option>
+                            <option value="active">Very Active (Delivery, Landscaping)</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="daily-steps" class="form-label">Average Daily Steps</label>
+                        <input type="number" class="form-control" id="daily-steps" placeholder="e.g. 8000">
+                    </div>
+                    <div class="mb-3">
+                        <label for="weekly-exercise" class="form-label">Weekly Exercise Sessions</label>
+                        <input type="number" class="form-control" id="weekly-exercise" placeholder="e.g. 3">
+                    </div>
+                    <div class="mb-3">
+                        <label for="exercise-duration" class="form-label">Average Exercise Duration (minutes)</label>
+                        <input type="number" class="form-control" id="exercise-duration" placeholder="e.g. 30">
+                    </div>
+                    <div class="mb-3">
+                        <label for="exercise-intensity" class="form-label">Exercise Intensity</label>
+                        <select class="form-select" id="exercise-intensity">
+                            <option value="">Select</option>
+                            <option value="low">Low (Walking, Yoga)</option>
+                            <option value="moderate">Moderate (Jogging, Cycling)</option>
+                            <option value="high">High (Running, HIIT, Sports)</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="goal" class="form-label">Goal</label>
+                        <select class="form-select" id="goal" required>
+                            <option value="">Select</option>
+                            <option value="weight_loss">Weight Loss</option>
+                            <option value="weight_maintenance">Weight Maintenance</option>
+                            <option value="weight_gain">Weight Gain</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="health-conditions" class="form-label">Health Conditions (optional)</label>
+                        <textarea class="form-control" id="health-conditions" rows="2"></textarea>
+                    </div>
+                    <div style="text-align: center;">
+                        <button type="submit" id="goalbutton" class="btn btn-primary" style="padding: 10px 30px;">Calculate Goals</button>
+                        <button type="button" id="cancel-edit-btn" style="padding: 10px 30px; margin-left: 10px; display: none;" class="btn btn-secondary">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Food Analysis Modal -->
+    <div id="food-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Add Food</h3>
+                <button id="close-modal-btn" class="close-btn">&times;</button>
+            </div>
+            <div id="modal-content">
+                <!-- Setup Phase -->
+                <div id="setup-phase" class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Setup</h5>
+                        <div class="instructions">
+                            <p>Enter your camera's focal length in pixels, then click "Open Camera" to start.</p>
+                        </div>
+                        <div class="mb-3">
+                            <label for="focal-length" class="form-label">Focal Length (pixels):</label>
+                            <input type="number" class="form-control" id="focal-length" placeholder="Enter focal length" value="1000">
+                            <small class="form-text text-muted">Standard mobile camera focal length is typically between 800-1600 pixels.</small>
+                        </div>
+                        <!-- Add this button in the setup-phase div, after the focal length input -->
+                        <div class="mb-3">
+                            <button id="calculate-focal-length" class="btn btn-info" style="width: 100%;">
+                                Calculate Focal Length
+                            </button>
+                            <br>
+                            <br>
+                        </div>
+                        <button id="open-camera" class="btn btn-primary">Open Camera</button>
+                    </div>
+                </div>
+                
+               <!-- Camera Phase -->
+                <div id="camera-phase" class="card" style="display: none;">
+                    <div class="card-body">
+                        <h5 class="card-title">Position Camera</h5>
+                        <div class="instructions">
+                            <p>Position your camera so the credit card is clearly visible.</p>
+                        </div>
+                        <div id="distance-display" class="distance-display"></div>
+                        <div class="camera-controls" style="margin-bottom: 10px; display: flex; justify-content: center;">
+                            <button id="toggle-flash-btn" class="btn btn-secondary" style="margin-right: 10px;">
+                                <span id="flash-icon">⚡</span> Flash Off
+                            </button>
+                            <button id="capture-btn" class="btn btn-primary">
+                                Capture Image
+                            </button>
+                        </div>
+                        <div class="camera-container">
+                            <canvas id="camera-canvas" style="display: none;"></canvas>
+                            <img id="camera-feed" alt="Camera Feed">
+                        </div>
+                        <button id="cancel-camera" class="btn btn-secondary mt-3">Cancel</button>
+                    </div>
+                </div>
+                
+                <!-- Loading Phase -->
+                <div id="loading-phase" class="loading" style="display: none;">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p>Calculating food volume... Please wait.</p>
+                </div>
+                
+                <!-- Results Phase -->
+                <div id="results-phase" class="card result-container" style="display: none;">
+                    <div class="card-body">
+                        <h5 class="card-title">Results</h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>Analyzed Image:</h6>
+                                <img id="result-image" class="result-image" alt="Analyzed Food">
+                            </div>
+                            <div class="col-md-6">
+                                <h6>Depth Map:</h6>
+                                <img id="depth-map" class="result-image" alt="Depth Map">
+                            </div>
+                        </div>
+                        
+                        <div class="nutrition-summary">
+                            <h2 class="mt-3">Nutrition Summary:</h2>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <h3 class="card-title">Totals</h3>
+                                            <div><strong>Volume: </strong><span id="total-volume">0</span> cm³</div>
+                                            <div><strong>Weight: </strong><span id="total-weight">0</span> g</div>
+                                            <div><strong>Calories: </strong><span id="total-calories">0</span></div>
+                                            <div><strong>Protein: </strong><span id="total-protein">0</span> g</div>
+                                            <div><strong>Carbs: </strong><span id="total-carbs">0</span> g</div>
+                                            <div><strong>Fats: </strong><span id="total-fats">0</span> g</div>
+                                            <div><strong>Fiber: </strong><span id="total-fiber">0</span> g</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <h2 class="mt-3">Detected Food Items:</h2>
+                        <div id="food-items-container"></div>
+                        
+                        <button id="restart-button" class="btn btn-primary mt-3">Start New Measurement</button>
+                        <button id="add-to-daily-log" class="btn btn-success mt-3">Add to Daily Log</button>
+                    </div>
+                </div>
+                
+                <!-- Error Alert -->
+                <div id="error-alert" class="alert alert-danger" style="display: none;">
+                    <strong>Error: </strong><span id="error-message"></span>
+                    <button id="error-button" class="btn btn-danger btn-sm float-end">Retry</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0,0,0,0.8);
+        z-index: 1000;
+        overflow-y: auto;
+    }
+    
+    .modal-content {
+        background: white;
+        max-width: 800px;
+        margin: 50px auto;
+        border-radius: 10px;
+        padding: 20px;
+    }
+    
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+    
+    .close-btn {
+        background: none;
+        border: none;
+        font-size: 24px;
+        cursor: pointer;
+    }
+    
+    .camera-container {
+        position: relative;
+        width: 100%;
+        height: 60vh;
+        background-color: #000;
+        overflow: hidden;
+    }
+    
+    #camera-feed {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .distance-display {
+        font-size: 1.2rem;
+        font-weight: bold;
+        margin: 10px 0;
+        text-align: center;
+    }
+    
+    .result-image {
+        width: 100%;
+        height: auto;
+        border-radius: 5px;
+        margin-bottom: 10px;
+    }
+    
+    .progress-ring-container {
+        text-align: center;
+        margin: 15px;
+        background-color: #f5f6f5;
+        border-radius: 50px;
+    }
+    
+    .progress-ring-circle {
+        transition: stroke-dashoffset 0.5s;
+        transform: rotate(-90deg);
+        transform-origin: 50% 50%;
+    }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        transition: all 0.3s;
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    }
+    
+    .btn-secondary {
+        transition: all 0.3s;
+        border: none;
+        background-color:#000;
+
+    }
+    
+    .btn-secondary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    }
+    
+    .loading {
+        text-align: center;
+        padding: 20px;
+    }
+    
+    .loading p {
+        margin-top: 10px;
+        color: #666;
+    }
+
+    h2{
+        color:rgb(47, 12, 83);
+        background-color: rgb(178, 214, 246);
+        border-radius: 50%; 
+    }
+    .card-title{
+        color: #000;
+        font-size: larger;
+        background-color: rgb(207, 207, 207);
+       
+    }
+    .form-label{
+        color: #ffffff;
+        font-size: medium;
+         margin-top: 10px;
+    }
+    #profile-form-container{
+        background: #6c757d;
+        width: 100%;
+    }
+    #sex{
+        width: 90px;
+        margin-left: 20px;
+    }
+    .form-control{
+        width: 290px;
+        margin-left: 20px;
+    }
+    .form-select{
+        height: 50px;
+        margin-left: 20px;
+    }
+    #goalbutton{
+        width:300px;
+        border:30px;
+        background-color:#8000ff
+    }
+    #logout-btn{
+        width: 50px;
+        border-radius: 50%;
+    }
+    .btn-warning {
+        background-color: #ffc107;
+        color: #000;
+    }
+
+    .camera-controls {
+        margin: 10px 0;
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+    }
+</style>
+
+<script>
+// Global variables
+let focalLength = null;
+let imageCheckInterval = null;
+let capturedImage = null;
+let videoStream = null;
+let videoElement = null;
+let isProcessing = false;
+let lastFrameTime = 0;
+const FRAME_INTERVAL = 100; // Minimum time between frames in ms
+let flashOn = false;
+let track = null;
+
+// DOM elements
+const setupPhase = document.getElementById('setup-phase');
+const cameraPhase = document.getElementById('camera-phase');
+const loadingPhase = document.getElementById('loading-phase');
+const resultsPhase = document.getElementById('results-phase');
+const errorAlert = document.getElementById('error-alert');
+const errorMessage = document.getElementById('error-message');
+const cameraFeed = document.getElementById('camera-feed');
+const cameraCanvas = document.getElementById('camera-canvas');
+const focalLengthInput = document.getElementById('focal-length');
+const distanceDisplay = document.getElementById('distance-display');
+const profileFormContainer = document.getElementById('profile-form-container');
+const nutritionDashboard = document.getElementById('nutrition-dashboard');
+const profileForm = document.getElementById('profile-form');
+const editProfileBtn = document.getElementById('edit-profile-btn');
+const cancelEditBtn = document.getElementById('cancel-edit-btn');
+const addFoodBtn = document.getElementById('add-food-btn');
+
+// Buttons
+const openCameraButton = document.getElementById('open-camera');
+const cancelCameraButton = document.getElementById('cancel-camera');
+const restartButton = document.getElementById('restart-button');
+const errorButton = document.getElementById('error-button');
+
+// Initialize the application
+function init() {
+    setupEventListeners();
+    createVideoElement();
+    checkUserProfile();
+}
+
+// Check if user has profile data
+function checkUserProfile() {
+    fetch('/get_nutrition_data')
+        .then(response => response.json())
+        .then(data => {
+            if (data.profile && Object.keys(data.profile).length > 0) {
+                // User has profile, show dashboard
+                profileFormContainer.style.display = 'none';
+                nutritionDashboard.style.display = 'block';
+                updateProgressRings(data.profile, data.daily_totals);
+                window.userProfileData = data.profile;
+            } else {
+                // No profile, show form
+                profileFormContainer.style.display = 'block';
+                nutritionDashboard.style.display = 'none';
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching profile data:', error);
+            showError('Failed to load profile data');
+        });
+}
+
+// Update progress rings with data
+function updateProgressRings(profile, dailyTotals) {
+    const metrics = ['calories', 'protein', 'carbs', 'fats'];
+    const colors = {
+        calories: '#4CAF50',
+        protein: '#2196F3',
+        carbs: '#FFC107',
+        fats: '#F44336'
+    };
+    
+    metrics.forEach(metric => {
+        const ring = document.querySelector(`.progress-ring[data-metric="${metric}"]`);
+        const circle = ring.querySelector('.progress-ring-circle');
+        const text = ring.querySelector('text:first-of-type');
+        
+        const target = profile[`target_${metric}`];
+        const consumed = dailyTotals[metric] || 0;
+        const percentage = Math.min(Math.round((consumed / target) * 100), 100);
+        
+        // Calculate circumference and offset
+        const radius = 52;
+        const circumference = 2 * Math.PI * radius;
+        const offset = circumference - (percentage / 100) * circumference;
+        
+        // Update circle
+        circle.style.strokeDasharray = `${circumference} ${circumference}`;
+        circle.style.strokeDashoffset = offset;
+        circle.style.stroke = colors[metric];
+        
+        // Update text
+        text.textContent = `${consumed}/${target}`;
+    });
+}
+
+// Set up all event listeners
+function setupEventListeners() {
+    // Camera related listeners
+    openCameraButton.addEventListener('click', startCameraPhase);
+    cancelCameraButton.addEventListener('click', cancelCameraPhase);
+    restartButton.addEventListener('click', restartApp);
+    errorButton.addEventListener('click', handleErrorRetry);
+    
+    // Profile related listeners
+    profileForm.addEventListener('submit', handleProfileSubmit);
+    editProfileBtn.addEventListener('click', handleEditProfile);
+    cancelEditBtn.addEventListener('click', handleCancelEdit);
+    addFoodBtn.addEventListener('click', () => {
+        document.getElementById('food-modal').style.display = 'block';
+    });
+    
+    // Add to Daily Log button
+    document.getElementById('add-to-daily-log').addEventListener('click', addToDailyLog);
+    
+    // Close modal button
+    document.getElementById('close-modal-btn').addEventListener('click', () => {
+        document.getElementById('food-modal').style.display = 'none';
+    });
+
+    // Add this to the setupEventListeners function
+    document.getElementById('calculate-focal-length').addEventListener('click', () => {
+        const popup = window.open('/focal_length', 'focalLength', 'width=600,height=800');
+        
+        // Listen for messages from the popup
+        window.addEventListener('message', (event) => {
+            if (event.data.type === 'focalLengthUpdate') {
+                document.getElementById('focal-length').value = event.data.focalLength;
+            }
+        });
+    });
+
+    document.getElementById('logout-btn').addEventListener('click', () => {
+        fetch('/logout')
+            .then(() => {
+                window.location.href = '/login';
+            })
+            .catch(error => {
+                console.error('Logout error:', error);
+            });
+    });
+
+    document.getElementById('toggle-flash-btn').addEventListener('click', toggleFlash);
+}
+
+// Handle profile form submission
+function handleProfileSubmit(e) {
+    e.preventDefault();
+    
+    const profileData = {
+        age: document.getElementById('age').value,
+        sex: document.getElementById('sex').value,
+        weight: document.getElementById('weight').value,
+        height: document.getElementById('height').value,
+        occupation_type: document.getElementById('occupation-type').value,
+        daily_steps: document.getElementById('daily-steps').value,
+        weekly_exercise: document.getElementById('weekly-exercise').value,
+        exercise_duration: document.getElementById('exercise-duration').value,
+        exercise_intensity: document.getElementById('exercise-intensity').value,
+        goal: document.getElementById('goal').value,
+        health_conditions: document.getElementById('health-conditions').value
+    };
+    
+    fetch('/save_profile', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(profileData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Hide form and show dashboard
+            profileFormContainer.style.display = 'none';
+            nutritionDashboard.style.display = 'block';
+            
+            // Refresh profile data
+            checkUserProfile();
+        } else {
+            showError(data.error || 'Failed to save profile');
+        }
+    })
+    .catch(error => {
+        console.error('Error saving profile:', error);
+        showError('Failed to save profile');
+    });
+}
+
+// Handle edit profile button click
+function handleEditProfile() {
+    nutritionDashboard.style.display = 'none';
+    profileFormContainer.style.display = 'block';
+    cancelEditBtn.style.display = 'inline-block';
+    
+    // Fill form with existing data
+    if (window.userProfileData) {
+        document.getElementById('age').value = window.userProfileData.age;
+        document.getElementById('sex').value = window.userProfileData.sex;
+        document.getElementById('weight').value = window.userProfileData.weight;
+        document.getElementById('height').value = window.userProfileData.height;
+        document.getElementById('activity-level').value = window.userProfileData.activity_level;
+        document.getElementById('goal').value = window.userProfileData.goal;
+        document.getElementById('health-conditions').value = window.userProfileData.health_conditions || '';
+        document.getElementById('occupation-type').value = window.userProfileData.occupation_type || '';
+        document.getElementById('daily-steps').value = window.userProfileData.daily_steps || '';
+        document.getElementById('weekly-exercise').value = window.userProfileData.weekly_exercise || '';
+        document.getElementById('exercise-duration').value = window.userProfileData.exercise_duration || '';
+        document.getElementById('exercise-intensity').value = window.userProfileData.exercise_intensity || '';
+    }
+}
+
+// Handle cancel edit button click
+function handleCancelEdit() {
+    profileFormContainer.style.display = 'none';
+    nutritionDashboard.style.display = 'block';
+    cancelEditBtn.style.display = 'none';
+}
+
+// Create video element for camera stream
+function createVideoElement() {
+    videoElement = document.createElement('video');
+    videoElement.setAttribute('playsinline', '');
+    videoElement.setAttribute('autoplay', '');
+    videoElement.setAttribute('muted', '');
+    videoElement.style.display = 'none';
+}
+
+// Start the camera phase
+function startCameraPhase() {
+    focalLength = parseFloat(focalLengthInput.value);
+    if (!focalLength || focalLength <= 0) {
+        showError("Please enter a valid focal length");
+        return;
+    }
+    
+    setupPhase.style.display = 'none';
+    cameraPhase.style.display = 'block';
+    distanceDisplay.textContent = 'Waiting for detection...';
+    openMobileCamera();
+}
+
+// Open the mobile back camera
+async function openMobileCamera() {
+    try {
+        const constraints = {
+            video: {
+                facingMode: { exact: 'environment' },
+                width: { ideal: 1280 },
+                height: { ideal: 720 },
+                orch: flashOn
+            }
+        };
+        
+        videoStream = await navigator.mediaDevices.getUserMedia(constraints);
+        videoElement.srcObject = videoStream;
+        
+        videoElement.onloadedmetadata = () => {
+            videoElement.play();
+            requestAnimationFrame(processVideoFrame);
+        };
+    } catch (error) {
+        console.error('Error accessing camera:', error);
+        showError(`Camera access failed: ${error.message}. Please check camera permissions.`);
+    }
+}
+
+// Process video frames from camera
+async function processVideoFrame() {
+    if (!videoStream || isProcessing) {
+        if (videoStream) {
+            requestAnimationFrame(processVideoFrame);
+        }
+        return;
+    }
+    
+    isProcessing = true;
+    
+    try {
+        const canvas = cameraCanvas;
+        canvas.width = videoElement.videoWidth;
+        canvas.height = videoElement.videoHeight;
+        const ctx = canvas.getContext('2d');
+        
+        ctx.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+        
+        const blob = await new Promise(resolve => {
+            canvas.toBlob(resolve, 'image/jpeg', 0.8);
+        });
+        
+        const formData = new FormData();
+        formData.append('frame', blob);
+        formData.append('focal_length', focalLength);
+        
+        const response = await fetch('/process_frame', {
+            method: 'POST',
+            body: formData
+        });
+        
+        const processedImageBlob = await response.blob();
+        const processedImageUrl = URL.createObjectURL(processedImageBlob);
+        
+        cameraFeed.src = processedImageUrl;
+        
+        const inRange = response.headers.get('X-In-Range') === 'True';
+        const distance = response.headers.get('X-Distance');
+        distanceDisplay.textContent = distance ? `${distance} cm` : 'Calculating...';
+        const savedImage = response.headers.get('X-Saved-Image');
+        
+        if (inRange && savedImage) {
+            capturedImage = savedImage;
+            stopVideoStream();
+            cameraPhase.style.display = 'none';
+            loadingPhase.style.display = 'block';
+            processImage();
+            return;
+        }
+    } catch (error) {
+        console.error('Error processing frame:', error);
+    } finally {
+        isProcessing = false;
+        if (videoStream) {
+            requestAnimationFrame(processVideoFrame);
+        }
+    }
+}
+
+// Stop video stream
+function stopVideoStream() {
+    if (videoStream) {
+        videoStream.getTracks().forEach(track => track.stop());
+        videoStream = null;
+    }
+}
+
+// Cancel the camera phase
+function cancelCameraPhase() {
+    stopVideoStream();
+    setupPhase.style.display = 'block';
+    cameraPhase.style.display = 'none';
+    errorAlert.style.display = 'none';
+}
+
+// Process the captured image
+function processImage() {
+    fetch('/process_image', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            'image': capturedImage,
+            'focal_length': focalLength
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            displayResults(data);
+        } else if (data.error && data.should_retry) {
+            showError(`${data.error}. Please try again.`, true);
+            loadingPhase.style.display = 'none';
+        } else {
+            showError(data.error || 'An error occurred during processing');
+            loadingPhase.style.display = 'none';
+        }
+    })
+    .catch(error => {
+        showError('Failed to process image: ' + error.message);
+        loadingPhase.style.display = 'none';
+    });
+}
+
+// Display the processing results
+function displayResults(data) {
+    loadingPhase.style.display = 'none';
+    resultsPhase.style.display = 'block';
+    
+    // Fix image paths
+    document.getElementById('result-image').src = `/tempupload/${data.annotated_image}?t=${Date.now()}`;
+    document.getElementById('depth-map').src = `/tempupload/${data.depth_map}?t=${Date.now()}`;
+    
+    // Rest of the function remains the same...
+    document.getElementById('total-volume').textContent = data.total_volume;
+    document.getElementById('total-weight').textContent = data.total_weight;
+    document.getElementById('total-calories').textContent = data.total_calories;
+    document.getElementById('total-protein').textContent = data.total_protein;
+    document.getElementById('total-carbs').textContent = data.total_carbs;
+    document.getElementById('total-fats').textContent = data.total_fats;
+    document.getElementById('total-fiber').textContent = data.total_fiber;
+    
+    const foodItemsContainer = document.getElementById('food-items-container');
+    foodItemsContainer.innerHTML = '';
+    
+    data.food_items.forEach(item => {
+        const itemElement = document.createElement('div');
+        itemElement.className = 'card mb-2';
+        itemElement.innerHTML = `
+            <div class="card-body">
+                <h6 class="card-title">${item.class}</h6>
+                <div>Volume: ${item.volume_cm3} cm³</div>
+                ${item.weight_g ? `<div>Weight: ${item.weight_g} g</div>` : ''}
+                ${item.calories ? `<div>Calories: ${item.calories}</div>` : ''}
+                ${item.protein_g ? `<div>Protein: ${item.protein_g} g</div>` : ''}
+                ${item.carbs_g ? `<div>Carbs: ${item.carbs_g} g</div>` : ''}
+                ${item.fats_g ? `<div>Fats: ${item.fats_g} g</div>` : ''}
+                ${item.fiber_g ? `<div>Fiber: ${item.fiber_g} g</div>` : ''}
+            </div>
+        `;
+        foodItemsContainer.appendChild(itemElement);
+    });
+}
+
+// Show error message
+function showError(message, isRetry = false) {
+    errorMessage.textContent = message;
+    errorAlert.style.display = 'block';
+    errorButton.style.display = isRetry ? 'block' : 'none';
+}
+
+// Handle error retry
+function handleErrorRetry() {
+    errorAlert.style.display = 'none';
+    startCameraPhase();
+}
+
+// Restart the application
+function restartApp() {
+    resultsPhase.style.display = 'none';
+    setupPhase.style.display = 'block';
+    errorAlert.style.display = 'none';
+}
+
+function toggleFlash() {
+    flashOn = !flashOn;
+    
+    if (videoStream) {
+        // Get the video track
+        const tracks = videoStream.getVideoTracks();
+        if (tracks.length > 0) {
+            track = tracks[0];
+            
+            // Try to apply flash settings if supported
+            if ('applyConstraints' in track) {
+                track.applyConstraints({
+                    advanced: [{torch: flashOn}]
+                }).then(() => {
+                    updateFlashButton();
+                }).catch(error => {
+                    console.error('Error setting torch:', error);
+                    // Fallback to regular flash if torch not supported
+                    if (flashOn) {
+                        document.getElementById('camera-feed').style.filter = 'brightness(150%) contrast(120%)';
+                    } else {
+                        document.getElementById('camera-feed').style.filter = '';
+                    }
+                    updateFlashButton();
+                });
+            } else {
+                // Fallback to CSS brightness adjustment
+                if (flashOn) {
+                    document.getElementById('camera-feed').style.filter = 'brightness(150%) contrast(120%)';
+                } else {
+                    document.getElementById('camera-feed').style.filter = '';
+                }
+                updateFlashButton();
+            }
+        }
+    }
+}
+
+function updateFlashButton() {
+    const flashIcon = document.getElementById('flash-icon');
+    const flashBtn = document.getElementById('toggle-flash-btn');
+    
+    if (flashOn) {
+        flashIcon.textContent = '⚡';
+        flashBtn.innerHTML = '<span id="flash-icon">⚡</span> Flash On';
+        flashBtn.classList.add('btn-warning');
+        flashBtn.classList.remove('btn-secondary');
+    } else {
+        flashIcon.textContent = '⚡';
+        flashBtn.innerHTML = '<span id="flash-icon">⚡</span> Flash Off';
+        flashBtn.classList.add('btn-secondary');
+        flashBtn.classList.remove('btn-warning');
+    }
+}
+
+// Add to Daily Log function
+function addToDailyLog() {
+    const totalCalories = parseFloat(document.getElementById('total-calories').textContent);
+    const totalProtein = parseFloat(document.getElementById('total-protein').textContent);
+    const totalCarbs = parseFloat(document.getElementById('total-carbs').textContent);
+    const totalFats = parseFloat(document.getElementById('total-fats').textContent);
+    
+    const nutritionData = {
+        calories: totalCalories,
+        protein: totalProtein,
+        carbs: totalCarbs,
+        fats: totalFats,
+        food_name: 'Food Analysis'  // You can customize this or make it dynamic
+    };
+    
+    fetch('/add_nutrition', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(nutritionData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Update the progress rings with new totals
+            checkUserProfile();
+            // Close the modal
+            document.getElementById('food-modal').style.display = 'none';
+            // Show success message
+            alert('Food added to daily log successfully!');
+        } else {
+            showError(data.error || 'Failed to add food to daily log');
+        }
+    })
+    .catch(error => {
+        console.error('Error adding food to daily log:', error);
+        showError('Failed to add food to daily log');
+    });
+}
+
+// Initialize the application when the page loads
+document.addEventListener('DOMContentLoaded', init);
+</script>
+{% endblock %}

@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block content %}
+<div style="text-align:center; margin-top:50px;">
+    <h2>SmartNutrition</h2>
+    <h2>Welcome!</h2>
+    <a href="{{ url_for('signup') }}" class="btn btn-primary">Sign Up</a>
+    <a href="{{ url_for('login') }}" class="btn btn-secondary">Login</a>
+</div>
+<img src="/static/assets/landed.jpg" class="landing_image">
+<style>
+    h2{
+        color:rgb(47, 12, 83);
+        background-color: rgb(178, 214, 246);
+        border-radius: 50%; 
+    }
+    img{
+        border-radius: 100px;
+    }
+</style>
+{% endblock %} 
