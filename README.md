@@ -1,4 +1,5 @@
 # Smart-Nutrition-YOLOV8-Midas-based-food-nutrition-tracker
+![Demo](demo.gif)
 [Click here to watch the demo video](./demo.mp4)
 
 This project estimates food nutrition (e.g., calories, weight, volume) from a **single image**, using a combination of:
